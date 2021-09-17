@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <title>ESP Web Server</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:,">
+        <style>
+            html{
+                font-family: Helvetica;
+                display:inline-block;
+                margin: 0px auto; text-align: center;
+                background-color: rgb(3, 19, 37);
+                color: rgb(230, 228, 228);
+            }
+            
+            h1{
+                color: #457add;
+                padding: 2vh;
+            }
+
+            p{
+                font-size: large;
+            }
+            
+            .button{
+                outline: none;
+                background-color: #e7bd3b;
+                border: none; 
+                border-radius: 8px;
+                color: white;
+                padding: 5px 40px;
+                text-decoration: none;
+                font-size: 30px;
+                margin: 5px;
+                cursor: pointer;
+            }
+            
+            .button2{
+                background-color: #4286f4;
+            }
+
+            .wrapper{
+                display: flex;
+                justify-content: center;
+            }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+        </style>
+    </head>
+    <body>
+        <h1 onClick="refreshPage()" style="cursor: pointer;">ESP Web Server</h1>
+        {{'502 Bad Gateway - MCU Unreachable' if not is_synced else ''}}
+
+        {% if is_synced %}
+            {% for (pin, name) in controls.switches.items() %}
+                <p id="{{pin+'text'}}"><b>{{pin}} / {{name.title()}}</b>: {{controls.states[controls.user_state[pin]]}} </p>
+                <div class="wrapper">
+                    <p><button id="{{pin}}" onclick=fetch_switch("{{request.base_url}}set?{{pin}}=1") class="button">ON</button></p>
+                    <p><button id="{{pin}}" onclick=fetch_switch("{{request.base_url}}set?{{pin}}=0") class="button button2">OFF</button></p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </body>
+    <script>
+        function refreshPage(){
+            window.location.reload();
+        }
+
+        function fetch_switch(url){
+            let e = document.getElementById(event.srcElement.id+'text');
+            let text = e.innerHTML.split(":");
+            e.innerHTML = text[0]+":"+" "+event.srcElement.innerHTML+" ";
+            fetch(url);
+        }
+    </script>
+</html>

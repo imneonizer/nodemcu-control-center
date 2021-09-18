@@ -3,6 +3,42 @@
         <title>ESP Web Server</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" href="data:,">
+        <script type="text/javascript" language="javascript">
+            function verify_auth(){
+                let auth = localStorage.getItem('nodemcu-auth');
+                if (auth !== null){auth = JSON.parse(auth);}
+                if (auth !== null){
+                    // load page with auth
+                    window.location.href = "/?auth="+auth;
+                }else{
+                    // get auth token from user
+                    let e = document.getElementById("auth-token-input");
+                    if (e){auth = e.value;}
+                    if (auth === null || auth.trim() === "") {
+                        console.log("No Auth Token provided");
+                    } else {
+                        let url = "{{request.base_url}}"+"get-devices?auth="+auth;
+                        fetch(url).then( res => {
+                            res.json().then( json => {
+                                if (res.status === 200){
+                                    console.log("Authentication success!")
+                                    localStorage.setItem('nodemcu-auth', JSON.stringify(auth));
+                                    window.location.href = "/?auth="+auth;
+                                }else if (res.status === 400){
+                                    console.log("No devices found!");
+                                    let  e = document.getElementById("auth-token-input");
+                                    let text = document.getElementById("incorrect-text");
+                                    e.style.border = "1px solid red";
+                                    text.style.visibility = "visible";
+                                    localStorage.setItem('nodemcu-auth', JSON.stringify(null));
+                                }
+                            })
+                        })
+                    }
+                }
+            }
+            verify_auth()
+        </script>
         <style>
             html{
                 font-family: Helvetica;
@@ -10,6 +46,9 @@
                 margin: 0px auto; text-align: center;
                 background-color: rgb(3, 19, 37);
                 color: rgb(230, 228, 228);
+                scroll-behavior: smooth;
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
             }
             
             h1{
@@ -27,11 +66,12 @@
                 border: none; 
                 border-radius: 8px;
                 color: white;
-                padding: 5px 40px;
+                padding: 15px 40px;
                 text-decoration: none;
-                font-size: 30px;
+                font-size: medium;
                 margin: 5px;
                 cursor: pointer;
+                width: 400px;
             }
             
             .button2{
@@ -43,35 +83,87 @@
                 justify-content: center;
             }
 
-        .button:active {
-            transform: translateY(1px);
-        }
+            .button:active {
+                transform: translateY(1px);
+            }
+
+            .input-box{
+                outline: none;
+                border: none; 
+                border-radius: 8px;
+                padding: 15px 40px;
+                text-decoration: none;
+                font-size: medium;
+                margin: 5px;
+                width: 400px;
+            }
+
+            .auth-form{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: -10px;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .input-box, .button {
+                    width: 90%;
+                }
+            }
+
+            #incorrect-text{
+                color: red;
+                visibility: hidden;
+                font-size: small
+            }
+
+            .app-title{
+                display: flex;
+                margin-left: auto;
+                margin-right: auto;
+                width: 24em
+            }
+
+            .switch-wrapper{
+                display: flex;
+                text-align: center;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .switch-wrapper-box{
+                background-color: rgb(15, 32, 51);
+                border-radius: 20px;
+                padding: 10px 20px 20px 20px;
+            }
         </style>
     </head>
     <body>
-        <h1 onClick="refreshPage()" style="cursor: pointer;">ESP Web Server</h1>
-        {{'502 Bad Gateway - MCU Unreachable' if not is_synced else ''}}
+        <div style="padding-left: 10px;">
+            <div class="app-title">
+                <img src="{{ url_for('static', filename='control.svg') }}" width="35px">
+                <h1 onClick="refreshPage()" style="cursor: pointer;">MCU Control Center</h1>
+            </div>
+        </div>
 
-        {% if is_synced %}
-            {% for (pin, name) in controls.switches.items() %}
-                <p id="{{pin+'text'}}"><b>{{pin}} / {{name.title()}}</b>: {{controls.states[controls.user_state[pin]]}} </p>
-                <div class="wrapper">
-                    <p><button id="{{pin}}" onclick=fetch_switch("{{request.base_url}}set?{{pin}}=1") class="button">ON</button></p>
-                    <p><button id="{{pin}}" onclick=fetch_switch("{{request.base_url}}set?{{pin}}=0") class="button button2">OFF</button></p>
+        <div class="switch-wrapper">
+            <div class="switch-wrapper-box">
+                <div class="auth-form">
+                    <p id="incorrect-text">No devies found</p>
+                    <input class="input-box" id="auth-token-input" type="text", placeholder="Enter Auth Token"></input>
+                    <button class="button" id="auth-token-button" onClick="verify_auth()" style="cursor: pointer">Login</button>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <p style="font-size:small">Connected Devices: {{num_devices}}</p>
+            </div>
+        </div>
     </body>
-    <script>
-        function refreshPage(){
-            window.location.reload();
-        }
-
-        function fetch_switch(url){
-            let e = document.getElementById(event.srcElement.id+'text');
-            let text = e.innerHTML.split(":");
-            e.innerHTML = text[0]+":"+" "+event.srcElement.innerHTML+" ";
-            fetch(url);
-        }
+    <script type="text/javascript">
+        document.getElementById("auth-token-input")
+            .addEventListener("keyup", function(event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                document.getElementById("auth-token-button").click();
+            }
+        });
     </script>
 </html>

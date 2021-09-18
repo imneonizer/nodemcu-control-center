@@ -42,5 +42,7 @@ else
         export AMPY_PORT=$DEVICE
         export AMPY_BAUD=115200
         alias mcu="picocom -b $AMPY_BAUD $AMPY_PORT"
+        alias mcp="ampy put"
+        alias mpy="ampy run"
     fi
 fi

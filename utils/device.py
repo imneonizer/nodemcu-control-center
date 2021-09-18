@@ -3,7 +3,7 @@ import json
 import re
 
 class ESPDevice:
-    def __init__(self, labels, alias=None, expire=10):
+    def __init__(self, labels, alias=None, expire=30):
         self.expire = expire
         self.alias = alias if alias else 'NodeMCU'
         self.labels = json.loads(labels)

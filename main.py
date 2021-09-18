@@ -11,7 +11,8 @@ esp.osdebug(None)
 ############ Credentials ################
 SSID = "OnePlus 8"
 PASSWORD = "123456789009"
-SERVER = "http://192.168.204.131:5000"
+# SERVER = "http://192.168.204.131:5000"
+SERVER = "https://mcu-control.herokuapp.com/"
 AUTH_TOKEN = "token"
 #######################################s##
 

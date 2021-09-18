@@ -105,4 +105,4 @@ while True:
         print(e)
         gc.collect()
         connect_wifi(SSID, PASSWORD, check=True)
-    sleep(0.5)
+    sleep(0.1)

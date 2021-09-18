@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect
+from flask_cors import CORS
 from collections import defaultdict
 from utils.device import ESPDevice
 from threading import Lock
@@ -6,6 +7,7 @@ import json
 import time
 
 app = Flask(__name__)
+CORS(app)
 devices = defaultdict(dict)
 lock = Lock()
 

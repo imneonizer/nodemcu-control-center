@@ -9,9 +9,11 @@ import gc
 esp.osdebug(None)
 
 ############ Credentials ################
-SSID = "OnePlus 8"
-PASSWORD = "123456789009"
+# SSID = "OnePlus 8"
+# PASSWORD = "123456789009"
 # SERVER = "http://192.168.204.131:5000"
+SSID = "Chitransh"
+PASSWORD = "11004455"
 SERVER = "https://mcu-control.herokuapp.com/"
 AUTH_TOKEN = "token"
 #######################################s##
@@ -106,4 +108,4 @@ while True:
         print(e)
         gc.collect()
         connect_wifi(SSID, PASSWORD, check=True)
-    sleep(0.1)
+    sleep(0.3)

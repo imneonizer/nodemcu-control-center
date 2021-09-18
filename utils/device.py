@@ -22,7 +22,8 @@ class ESPDevice:
         return self.synced
     
     def sync_state(self, data):
-        self.user_state.update(data)
+        self.mcu_state.update(data)
+        # self.user_state.update(data)
         self.st = time.time()
         self.synced = True
 

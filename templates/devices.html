@@ -157,7 +157,7 @@
 
                 {% if devices[auth_token][device_id].is_synced %}
                     {% for (pin, name) in devices[auth_token][device_id].get_labels() %}
-                        <p class={{devices[auth_token][device_id].user_state[pin]}} id="{{pin+'text'}}"><b>{{pin}} / {{name.title()}}</b>: {{'💡' if devices[auth_token][device_id].user_state[pin].upper() == "ON" else "🔌"}} {{devices[auth_token][device_id].user_state[pin].upper()}} </p>
+                        <p class={{devices[auth_token][device_id].user_state[pin]}} id="{{pin+'text'}}"><b>{{pin}} / {{name.title()}}</b>: {{'💡' if devices[auth_token][device_id].mcu_state[pin].upper() == "ON" else "🔌"}} {{devices[auth_token][device_id].mcu_state[pin].upper()}} </p>
                         <div class="wrapper" style="display: flex;">
                             <button id="{{pin}}" onclick=fetch_switch("{{request.url}}&update={{pin}}=on") class="button">💡 ON</button>
                             <button id="{{pin}}" onclick=fetch_switch("{{request.url}}&update={{pin}}=off") class="button button2">🔌 OFF</button>

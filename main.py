@@ -1,4 +1,2 @@
-import os
-os.chdir("src")
-from app import main
-main()
+import os; os.chdir("src")
+import app

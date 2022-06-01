@@ -1,40 +1,21 @@
 #! /bin/bash
 # script to flash esp8266 based nodemcu
-
+# sudo usermod -a -G dialout $USER
 
 FIRMWARE_NAME='esp8266-micropython.bin'
 FIRMWARE_URL='https://micropython.org/resources/firmware/esp8266-20210902-v1.17.bin'
-DEVICE=$1
 
+if [[ $1 == /dev/ttyUSB* ]] ;then
+    DEVICE="$1"
+else
+    DEVICE="/dev/ttyUSB$1"
+fi
 
 # download firmware
 mkdir -p "/tmp"
 if [ ! -e "/tmp/$FIRMWARE_NAME" ]; then
     wget $FIRMWARE_URL -O "/tmp/$FIRMWARE_NAME"
 fi
-
-
-# install dev tools: esptool, adafruit-ampy
-if [ "`pip -V`" ];then
-    # check esptool.py
-    if [ ! "`pip freeze | grep -i esptool`" ];then
-        pip install esptool.py
-    fi
-
-    # check ampy
-    if [ ! "`pip freeze | grep -i adafruit-ampy`" ];then
-        pip install adafruit-ampy
-    fi
-
-    # check rshell
-    if [ ! "`pip freeze | grep -i rshell`" ];then
-        pip install rshell
-    fi
-else
-    echo "pip not found"
-    exit -1
-fi
-
 
 # validate device
 if [ ! "$DEVICE" ]; then

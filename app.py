@@ -106,8 +106,8 @@ def mcu_set_update():
         device = devices[auth_token][device_id]
     
     with lock:
-        # if not device.is_synced:
-        device.sync_state(request.json)
+        if not device.is_synced:
+            device.sync_state(request.json)
     
     return "ok"
 

@@ -1,33 +1,17 @@
 #! /bin/bash
 # script to work with esp8266 based nodemcu
 
-DEVICE=$1
+
+if [[ $1 == /dev/ttyUSB* ]] ;then
+    DEVICE="$1"
+else
+    DEVICE="/dev/ttyUSB$1"
+fi
 
 # check if script is being sourced
 if [[ ! "${BASH_SOURCE[0]}" != "${0}" ]];then
-    echo "Usage: source $0"
+    echo "Usage: source $0 $@"
     exit
-fi
-
-# install dev tools: esptool, adafruit-ampy
-if [ "`pip -V`" ];then
-    # check esptool.py
-    if [ ! "`pip freeze | grep -i esptool`" ];then
-        pip install esptool.py
-    fi
-
-    # check ampy
-    if [ ! "`pip freeze | grep -i adafruit-ampy`" ];then
-        pip install adafruit-ampy
-    fi
-
-    # check rshell
-    if [ ! "`pip freeze | grep -i rshell`" ];then
-        pip install rshell
-    fi
-else
-    echo "pip not found"
-    exit -1
 fi
 
 # validate device
@@ -42,7 +26,9 @@ else
         export AMPY_PORT=$DEVICE
         export AMPY_BAUD=115200
         alias mcu="picocom -b $AMPY_BAUD $AMPY_PORT"
-        alias mcp="ampy put"
+        alias mcp='_(){ ampy put $1 $1; }; _'
+        alias acp="ampy put"
         alias mpy="ampy run"
+        alias deploy="ampy put lib; ampy put src; ampy put main.py"
     fi
 fi

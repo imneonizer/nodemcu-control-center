@@ -16,13 +16,19 @@ esp.osdebug(None)
 SSID = "imiot"
 PASSWORD = "super_secret"
 SERVER = "http://192.168.0.90:5000"
+SERVER="http://flaskiot.duckdns.org"
 AUTH_TOKEN = "token"
 #######################################s##
 
 ap = network.WLAN(network.AP_IF)
 ap.active(False)
 
+aic = ArduinoI2C()
+pins = RelayPins(aic)
+# rfid = RFID()
+
 def connect_wifi(ssid, password, check=False):
+    aic.led.yellow()
     print("connecting to wifi... {}".format(SSID))
     station = network.WLAN(network.STA_IF)
     if check and station.isconnected():
@@ -36,6 +42,7 @@ def connect_wifi(ssid, password, check=False):
 
     print('Connection successful')
     print(station.ifconfig())
+    aic.led.off()
 
 
 # connect to the wifi on boot
@@ -49,10 +56,6 @@ except:
     import upip
     upip.install("micropython-urequests")
     import urequests as requests
-
-aic = ArduinoI2C()
-pins = RelayPins(aic)
-# rfid = RFID()
 
 headers = {
     'content-type': 'application/json',
@@ -102,7 +105,7 @@ def main():
 
             r = r.json()
 
-            print("-"*10)
+            # print("-"*10)
             for (name, value_to_set) in r.items():
                 p = pins.exist(name)
                 if not p:
@@ -117,15 +120,16 @@ def main():
                     pins.send()
 
                 # print live pin values
-                print(name, "=", pins.read(p))
+                # print(name, "=", pins.read(p))
 
-            print("WS = %s" % aic.read_water_sensor())
+            # print("WS = %s" % aic.read_water_sensor())
             # send latest update to the server
             state = json.dumps(pins.items())
             r = requests.post(SERVER+"/mcu-set-update",
                             headers=headers, data=state)
             gc.collect()
         except Exception as e:
+            aic.led.red()
             print(e)
             gc.collect()
             connect_wifi(SSID, PASSWORD, check=True)
